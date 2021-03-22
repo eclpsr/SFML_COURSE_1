@@ -34,6 +34,10 @@ int main() {
 
 		//Clear everything from the last frame
 		window.clear();
+
+		// Draw our game scene here
+		window.draw(spriteBackground);
+
 		// Show everything we just drew
 		window.display();
 	}
