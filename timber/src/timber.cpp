@@ -71,11 +71,19 @@ int main() {
 	// Variables to control time itself
 	Clock clock;
 
+	// Track whether the game is running
+	bool paused = true;
+
 	while (window.isOpen()){
 		if (Keyboard::isKeyPressed(Keyboard::Escape)){
 			window.close();
 		}
 
+		if(Keyboard::isKeyPressed(Keyboard::Return)){
+			paused = false;
+		}
+
+		if(!paused){
 		// Measure time(измерить время)
 		Time dt = clock.restart();
 
@@ -163,6 +171,8 @@ int main() {
 				// Set it up ready to be a whole new cloud next frame
 				cloud3Active = false;
 			}
+		}
+
 		}
 
 		//Clear everything from the last frame
