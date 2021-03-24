@@ -178,13 +178,26 @@ int main() {
 	float logSpeedX = 1000;
 	float logSpeedY = -1500;
 
-	updateBranches(1);
+	/*updateBranches(1);
 	updateBranches(2);
 	updateBranches(3);
 	updateBranches(4);
-	updateBranches(5);
+	updateBranches(5);*/
+
+	// Control the player input
+	bool acceptInput = false;
 
 	while (window.isOpen()){
+		Event event;
+		while (window.pollEvent(event)){
+			if(event.type == Event::KeyReleased && !paused){
+				// Listen for key presses again
+				acceptInput = true;
+
+				// hide the axe
+				spriteAxe.setPosition(2000, spriteAxe.getPosition().y);
+			}
+		}
 		if (Keyboard::isKeyPressed(Keyboard::Escape)){
 			window.close();
 		}
@@ -195,7 +208,71 @@ int main() {
 			// Reset the time and the score
 			score = 0;
 			timeRemaining = 5;
+
+			// Make all the branches disappear
+			for (int i = 1; i < NUM_BRANCHES; i++){
+				branchPositions[i] = side::NONE;
+			}
+
+			// Make sure the gravestone is hidden
+			spriteRIP.setPosition(675, 2000);
+
+			// Move the player into position
+			spritePlayer.setPosition(580, 720);
+			acceptInput = true;
 		}
+
+		// Wrap the player controls to
+		// Make sure we are accepting input
+		if (acceptInput){
+			// First handle pressing the right cursor key
+			if (Keyboard::isKeyPressed(Keyboard::Right)){
+				// Make sure the player is on the right
+				playerSide = side::RIGHT;
+				score++;
+
+				// Add to the amount of time remaining
+				timeRemaining += (2 / score) + .15;
+
+				spriteAxe.setPosition(AXE_POSITION_RIGHT, spriteAxe.getPosition().y);
+
+				spritePlayer.setPosition(1200, 720);
+
+				// update the branches
+				updateBranches(score);
+
+				// set the log flying to the left
+				spriteLog.setPosition(810, 720);
+				logSpeedX = -5000;
+				logActive = true;
+
+				acceptInput = false;
+			}
+			//Handle the left cursor key
+			if (Keyboard::isKeyPressed(Keyboard::Left)){
+				// Make sure the player is on the right
+				playerSide = side::LEFT;
+				score++;
+
+				// Add to the amount of time remaining
+				timeRemaining += (2 / score) + .15;
+
+				spriteAxe.setPosition(AXE_POSITION_LEFT, spriteAxe.getPosition().y);
+
+				spritePlayer.setPosition(580, 720);
+
+				// update the branches
+				updateBranches(score);
+
+				// set the log flying to the left
+				spriteLog.setPosition(810, 720);
+				logSpeedX = -5000;
+				logActive = true;
+
+				acceptInput = false;
+			}
+		}
+
 
 		if(!paused){
 		// Measure time(измерить время)
@@ -330,6 +407,47 @@ int main() {
 				// Hide the branch
 				branches[i].setPosition(3000, height);
 			}
+		}
+
+		// Handle a flying log
+		if (logActive){
+			spriteLog.setPosition(
+					spriteLog.getPosition().x +
+					(logSpeedX * dt.asSeconds()),
+					spriteLog.getPosition().y +
+					(logSpeedY * dt.asSeconds()));
+
+			// Has the log reached the right hand edge?
+			if (spriteLog.getPosition().x < -100 ||
+				spriteLog.getPosition().x > 2000){
+				logActive = false;
+				spriteLog.setPosition(810, 720);
+			}
+		}
+
+		// Has the player been squished by a branch?
+		if (branchPositions[5] == playerSide){
+			// death
+			paused = true;
+			acceptInput = false;
+
+			// Draw the gravestone
+			spriteRIP.setPosition(525, 760);
+
+			// hide the player
+			spritePlayer.setPosition(2000, 660);
+
+			// Change the text of the message
+			messageText.setString("SQUISHED!!");
+
+			// Center on the screen
+			FloatRect textRect = messageText.getLocalBounds();
+
+			messageText.setOrigin(textRect.left +
+				textRect.width / 2.0f,
+				textRect.top + textRect.height / 2.0f);
+
+			messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
 		}
 
 		} //?
