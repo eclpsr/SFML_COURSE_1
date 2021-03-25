@@ -1,5 +1,6 @@
-#include "SFML/Graphics.hpp"
 #include <sstream>
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 using namespace sf;
 
@@ -187,6 +188,22 @@ int main() {
 	// Control the player input
 	bool acceptInput = false;
 
+	// Prepare the sound
+	SoundBuffer chopBuffer;
+	chopBuffer.loadFromFile("sound/chop.wav");
+	Sound chop;
+	chop.setBuffer(chopBuffer);
+
+	SoundBuffer deathBuffer;
+	deathBuffer.loadFromFile("sound/death.wav");
+	Sound death;
+	death.setBuffer(deathBuffer);
+
+	SoundBuffer ootBuffer;
+	ootBuffer.loadFromFile("sound/out_of_time.wav");
+	Sound outOfTime;
+	outOfTime.setBuffer(ootBuffer);
+
 	while (window.isOpen()){
 		Event event;
 		while (window.pollEvent(event)){
@@ -247,6 +264,9 @@ int main() {
 				logActive = true;
 
 				acceptInput = false;
+
+				// Play a chop sound
+				chop.play();
 			}
 			//Handle the left cursor key
 			if (Keyboard::isKeyPressed(Keyboard::Left)){
@@ -270,6 +290,9 @@ int main() {
 				logActive = true;
 
 				acceptInput = false;
+
+				// Play a chop sound
+				chop.play();
 			}
 		}
 
@@ -297,6 +320,9 @@ int main() {
 					textRect.top +
 					textRect.height / 2.0f);
 			messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
+
+			// Play the out of time sound
+			outOfTime.play();
 		}
 
 		// Setup the bee
@@ -448,6 +474,9 @@ int main() {
 				textRect.top + textRect.height / 2.0f);
 
 			messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
+
+			// Play the death sound
+			death.play();
 		}
 
 		} //?zz
